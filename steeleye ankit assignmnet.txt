@@ -1,0 +1,98 @@
+1.Explain what the simple List component does.
+
+. <SimpleList> as <List> or <ReferenceManyField> child. You must set at least the primaryText prop,
+ and it should be a function returning the text to render for each list item.
+
+2.What problems / warnings are there with code?
+
+Syntax Error in useState() : const [setSelectedIndex, selectedIndex] = useState();
+ setSelectedIndex should be 2nd params because value store in setSelected will update our state.
+ const[selectedIndex,setSelectedIndex]=useState(); this is the correct syntax.
+
+.Type Error in shape() function shapeOf() is not any function
+
+
+WrappedListComponent.propTypes = {
+  items: PropTypes.arrayOf(
+    PropTypes.shape({
+      text: PropTypes.string.isRequired,
+    })
+  ),
+};
+
+
+3.  please fix, optimize, and/or modify the component as much as you think is necessary
+
+
+import React, { useState, useEffect, memo } from "react";
+import PropTypes from "prop-types";
+
+// Single List Item
+const WrappedSingleListItem = ({ index, isSelected, onClickHandler, text }) => {
+  return (
+    <li
+      style={{ backgroundColor: isSelected ? "red" : "green" }}
+      onClick={() => onClickHandler(index)}
+    >
+      {text}
+    </li>
+  );
+};
+
+WrappedSingleListItem.propTypes = {
+  index: PropTypes.number,
+  isSelected: PropTypes.bool,
+  onClickHandler: PropTypes.func.isRequired,
+  text: PropTypes.string.isRequired
+};
+
+const SingleListItem = memo(WrappedSingleListItem);
+
+// List Component
+const WrappedListComponent = ({ items }) => {
+  const [selectedIndex, setSelectedIndex] = useState();
+
+  useEffect(() => {
+    setSelectedIndex(null);
+  }, [items]);
+
+  const handleClick = (index) => {
+    setSelectedIndex(index);
+  };
+
+  return (
+    <ul style={{ textAlign: "left" }}>
+      {items.map((item, index) => (
+        <SingleListItem
+          onClickHandler={() => handleClick(index)}
+          text={item.text}
+          index={index}
+          key={index}
+          isSelected={selectedIndex === index}
+        />
+      ))}
+    </ul>
+  );
+};
+
+WrappedListComponent.propTypes = {
+  items: PropTypes.arrayOf(
+    PropTypes.shape({
+      text: PropTypes.string.isRequired
+    })
+  )
+};
+
+WrappedListComponent.defaultProps = {
+  items: [
+    { text: "Ankit", index: 1 },
+    { text: "sharma", index: 2 },
+    { text: "run", index: 3 },
+    { text: "world", index: 4 }
+  ]
+};
+
+const List = memo(WrappedListComponent);
+
+export default List;
+
